@@ -31,6 +31,11 @@
   }
 %}
 
+type  /^integer$/
+var  /^var$/
+begin  /^Begin$/
+end  /^End.$/
+program  /^program$/
 id    [a-zA-Z][a-zA-Z_0-9]*
 int   [0-9]+
 blank [ \t\r]
@@ -80,8 +85,16 @@ blank [ \t\r]
 ")"        return yy::parser::make_RPAREN (loc);
 ":="       return yy::parser::make_ASSIGN (loc);
 ";"        return yy::parser::make_SEMICOLON(loc);
+":"        return yy::parser::make_COLON(loc);
+"var"      return yy::parser::make_VAR(loc);
+"integer"  return yy::parser::make_TYPE(loc);
+"writeln"  return yy::parser::make_PRINT(loc);
+"Begin"    return yy::parser::make_BEGIN(loc);
+"End."      return yy::parser::make_PREND(loc);
+"program"  return yy::parser::make_PROGRAM(loc);
 
 {int}      return make_NUMBER(yytext, loc);
+
 {id}       {
                 if (driver.location_debug) {
                     std::cerr << "ID found " << yytext << std::endl;

@@ -14,6 +14,7 @@ class Driver {
     int result;
     int parse(const std::string& f);
     std::string file;
+    std::string name;
     bool trace_parsing;
 
     void scan_begin();

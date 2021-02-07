@@ -46,6 +46,13 @@
     LPAREN "("
     RPAREN ")"
     SEMICOLON ";"
+    COLON ":"
+    VAR "var"
+    TYPE "type"
+    PRINT "writeln"
+    BEGIN "begin"
+    PREND "end"
+    PROGRAM "program"
 ;
 
 %token <std::string> IDENTIFIER "identifier"
@@ -59,19 +66,36 @@
 %left "+" "-";
 %left "*" "/";
 
-%start unit;
-unit: assignments exp ";" { driver.result = $2; };
+%start program;
 
-assignments:
-    %empty {}
-    | assignments assignment {};
+program: PROGRAM IDENTIFIER ";" code
+			{
+			driver.name = $2;
+			std::cout << "Running program " << driver.name << " ..." << std::endl;
+			};
+
+code: BEGIN unit PREND {};
+
+unit:     %empty {}
+	| unit assignment;
+	| unit declaration;
+	| unit print;
+
+print: PRINT "(" exp ")" ";" { std::cout << $3 << std::endl;};
+
+declaration: decl ":" TYPE ";" {};
+
+decl: VAR IDENTIFIER {driver.variables[$2];};
 
 assignment:
-    "identifier" ":=" exp ";" {
+    IDENTIFIER ":=" exp ";" {
         driver.variables[$1] = $3;
         if (driver.location_debug) {
             std::cerr << driver.location << std::endl;
+            driver.result = -1;
         }
+
+        driver.result = 0;
     }
     | error ";" {
     	// Hint for compilation error, resuming producing messages
@@ -79,11 +103,9 @@ assignment:
     	yyerrok;
     };
 
-
-
 exp:
-    "number"
-    | "identifier" {$$ = driver.variables[$1];}
+    NUMBER
+    | IDENTIFIER {$$ = driver.variables[$1];}
     | exp "+" exp {$$ = $1 + $3; }
     | exp "-" exp {$$ = $1 - $3; }
     | exp "*" exp {$$ = $1 * $3; }

@@ -1,0 +1,13 @@
+program interpretee;
+
+Begin
+
+var a : integer;
+var b : integer;
+var c : integer;
+
+a := 3;
+b := 23;
+c := a + b;
+writeln(c);
+End.
